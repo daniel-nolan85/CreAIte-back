@@ -1,8 +1,10 @@
 import mongoose from 'mongoose';
 
+const { ObjectId } = mongoose.Schema;
+
 const creationSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true },
+    createdBy: { type: ObjectId, ref: 'User', required: true },
     prompt: { type: String, required: true },
     photo: { type: String, required: true },
   },

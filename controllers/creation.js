@@ -55,12 +55,12 @@ export const createCaption = async (req, res) => {
 };
 
 export const createCreation = async (req, res) => {
-  const { name, prompt, photo } = req.body.form;
+  const { createdBy, prompt, photo } = req.body.form;
   console.log('req.body => ', req.body);
   try {
     const photoUrl = await cloudinary.uploader.upload(photo);
     const newCreation = await Creation.create({
-      name,
+      createdBy,
       prompt,
       photo: photoUrl.url,
     });
@@ -73,7 +73,21 @@ export const createCreation = async (req, res) => {
 
 export const fetchCreations = async (req, res) => {
   try {
-    const creations = await Creation.find({});
+    const creations = await Creation.find({}).populate('createdBy', 'name');
+    res.status(200).json(creations);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error });
+  }
+};
+
+export const fetchUserCreations = async (req, res) => {
+  const { _id } = req.body;
+  try {
+    const creations = await Creation.find({ createdBy: _id }).populate(
+      'createdBy',
+      'name'
+    );
     res.status(200).json(creations);
   } catch (error) {
     console.error(error);
