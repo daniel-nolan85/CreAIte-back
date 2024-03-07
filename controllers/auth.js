@@ -26,7 +26,7 @@ export const loginUser = async (req, res) => {
         $set: { lastLogin: new Date(Date.now()) },
       },
       { new: true }
-    ).select(`_id name email lastLogin`);
+    ).select(`_id name email lastLogin bio profileImage coverImage`);
     console.log({ user });
     res.json(user);
   } catch (err) {
@@ -40,7 +40,9 @@ export const googleUser = async (req, res) => {
   console.log({ name });
   console.log({ email });
   try {
-    let user = await User.findOne({ email }).select(`_id name email lastLogin`);
+    let user = await User.findOne({ email }).select(
+      `_id name email lastLogin bio profileImage coverImage`
+    );
     if (!user) {
       user = await new User({
         name,
@@ -53,7 +55,7 @@ export const googleUser = async (req, res) => {
           $set: { lastLogin: new Date(Date.now()) },
         },
         { new: true }
-      ).select(`_id name email lastLogin`);
+      ).select(`_id name email lastLogin bio profileImage coverImage`);
     }
     console.log({ user });
     res.json(user);

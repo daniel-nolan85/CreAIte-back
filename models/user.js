@@ -10,7 +10,16 @@ const userSchema = new mongoose.Schema(
       unique: true,
       text: true,
     },
+    bio: { type: String, text: true, maxlength: 500 },
     lastLogin: { type: Date },
+    profileImage: {
+      url: String,
+      public_id: String,
+    },
+    coverImage: {
+      url: String,
+      public_id: String,
+    },
   },
   { timestamps: true }
 );
