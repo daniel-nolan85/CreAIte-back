@@ -16,7 +16,6 @@ const openai = new OpenAIApi({
 
 export const createImage = async (req, res) => {
   const { prompt } = req.body;
-  console.log({ prompt });
   try {
     const aiResponse = await openai.images.generate({
       prompt,
@@ -24,7 +23,6 @@ export const createImage = async (req, res) => {
       size: '1024x1024',
       response_format: 'b64_json',
     });
-    console.log('aiResponse => ', aiResponse.data);
     const image = aiResponse.data[0].b64_json;
     const revisedPrompt = aiResponse.data[0].revised_prompt;
     res.status(200).json({ photo: image, revisedPrompt });
@@ -35,9 +33,10 @@ export const createImage = async (req, res) => {
 };
 
 export const createCaption = async (req, res) => {
-  const { message } = req.body;
+  const { prompt } = req.body;
   try {
-    const res = await openai.chat.completions.create({
+    const message = `Create a caption for an image that has previously been generated using this prompt: ${prompt}`;
+    const aiResponse = await openai.chat.completions.create({
       model: 'gpt-3.5-turbo-0613',
       messages: [{ role: 'user', content: message }],
       temperature: 0.7,
@@ -46,7 +45,7 @@ export const createCaption = async (req, res) => {
       frequency_penalty: 0,
       presence_penalty: 0,
     });
-    const caption = res.choices[0].message.content;
+    const caption = aiResponse.choices[0].message.content;
     res.status(200).json({ caption });
   } catch (error) {
     console.error(error);
@@ -54,15 +53,39 @@ export const createCaption = async (req, res) => {
   }
 };
 
-export const createCreation = async (req, res) => {
-  const { createdBy, prompt, photo } = req.body.form;
-  console.log('req.body => ', req.body);
+export const createKeywords = async (req, res) => {
+  const { prompt } = req.body;
+  try {
+    const message = `Provide some comma separated keywords that will relate to an image that has previously been generated using this prompt: ${prompt}`;
+    const aiResponse = await openai.chat.completions.create({
+      model: 'gpt-3.5-turbo-0613',
+      messages: [{ role: 'user', content: message }],
+      temperature: 0.7,
+      max_tokens: 256,
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0,
+    });
+    const keywords = aiResponse.choices[0].message.content;
+    res.status(200).json({ keywords });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error?.response.data.error.message);
+  }
+};
+
+export const saveCreation = async (req, res) => {
+  const { createdBy, prompt, photo, caption, keywords } = req.body.form;
+  const { sharing } = req.body;
   try {
     const photoUrl = await cloudinary.uploader.upload(photo);
     const newCreation = await Creation.create({
       createdBy,
       prompt,
       photo: photoUrl.url,
+      caption,
+      keywords,
+      sharing,
     });
     res.status(201).json({ success: true, data: newCreation });
   } catch (error) {
@@ -71,9 +94,12 @@ export const createCreation = async (req, res) => {
   }
 };
 
-export const fetchCreations = async (req, res) => {
+export const fetchSharedCreations = async (req, res) => {
   try {
-    const creations = await Creation.find({}).populate('createdBy', 'name');
+    const creations = await Creation.find({ sharing: true }).populate(
+      'createdBy',
+      'name'
+    );
     res.status(200).json(creations);
   } catch (error) {
     console.error(error);

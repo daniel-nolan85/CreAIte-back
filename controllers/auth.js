@@ -2,8 +2,6 @@ import User from '../models/user.js';
 
 export const createUser = async (req, res) => {
   const { name, email } = req.body;
-  console.log({ name });
-  console.log({ email });
   try {
     const newUser = await new User({
       name,
@@ -18,7 +16,6 @@ export const createUser = async (req, res) => {
 
 export const loginUser = async (req, res) => {
   const { email } = req.body;
-  console.log({ email });
   try {
     const user = await User.findOneAndUpdate(
       { email },
@@ -27,7 +24,6 @@ export const loginUser = async (req, res) => {
       },
       { new: true }
     ).select(`_id name email lastLogin bio profileImage coverImage`);
-    console.log({ user });
     res.json(user);
   } catch (err) {
     res.status(400);
@@ -37,8 +33,6 @@ export const loginUser = async (req, res) => {
 
 export const googleUser = async (req, res) => {
   const { name, email } = req.body;
-  console.log({ name });
-  console.log({ email });
   try {
     let user = await User.findOne({ email }).select(
       `_id name email lastLogin bio profileImage coverImage`
@@ -57,7 +51,6 @@ export const googleUser = async (req, res) => {
         { new: true }
       ).select(`_id name email lastLogin bio profileImage coverImage`);
     }
-    console.log({ user });
     res.json(user);
   } catch (err) {
     res.status(400);
