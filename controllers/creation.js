@@ -114,7 +114,8 @@ export const fetchUserCreations = async (req, res) => {
       'createdBy',
       'name'
     );
-    res.status(200).json(creations);
+    const likedCreations = await Creation.find({ likes: { $in: [_id] } });
+    res.status(200).json({ creations, likedCreations });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: error });

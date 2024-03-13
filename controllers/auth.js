@@ -57,3 +57,15 @@ export const googleUser = async (req, res) => {
     throw new Error(err.message);
   }
 };
+
+export const currentUser = async (req, res) => {
+  console.log('currentUser =>', req.body);
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email }).exec();
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

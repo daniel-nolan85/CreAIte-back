@@ -25,7 +25,7 @@ export const updateProfile = async (req, res) => {
     }
     const user = await User.findByIdAndUpdate(_id, data, {
       new: true,
-    }).select(`name bio`);
+    });
     res.json(user);
   } catch (error) {
     console.error('Error updating user:', error.message);
@@ -40,7 +40,7 @@ export const updateProfileImage = async (req, res) => {
       _id,
       { $set: { profileImage: profileImage } },
       { new: true }
-    ).select('profileImage');
+    );
 
     res.json(user);
   } catch (error) {
@@ -56,7 +56,7 @@ export const updateCoverImage = async (req, res) => {
       _id,
       { $set: { coverImage: coverImage } },
       { new: true }
-    ).select('coverImage');
+    );
 
     res.json(user);
   } catch (error) {
