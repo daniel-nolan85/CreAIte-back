@@ -12,7 +12,7 @@ const creationSchema = new mongoose.Schema(
     sharing: { type: Boolean, default: true },
     resolution: { type: String },
     downloads: { type: Number },
-    likes: { type: Number },
+    likes: [{ type: ObjectId, ref: 'User' }],
   },
   { timestamps: true }
 );

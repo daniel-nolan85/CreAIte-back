@@ -120,3 +120,48 @@ export const fetchUserCreations = async (req, res) => {
     res.status(500).json({ success: false, message: error });
   }
 };
+
+export const downloadCreation = async (req, res) => {
+  const { _id } = req.body;
+  try {
+    const creation = await Creation.findByIdAndUpdate(
+      _id,
+      { $inc: { downloads: 1 } },
+      { new: true }
+    );
+    res.status(200).json(creation);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error });
+  }
+};
+
+export const likeCreation = async (req, res) => {
+  const { userId, _id } = req.body;
+  try {
+    const creation = await Creation.findByIdAndUpdate(
+      _id,
+      { $addToSet: { likes: userId } },
+      { new: true }
+    ).populate('likes', '_id name profileImage');
+    res.status(200).json(creation);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error });
+  }
+};
+
+export const unlikeCreation = async (req, res) => {
+  const { userId, _id } = req.body;
+  try {
+    const creation = await Creation.findByIdAndUpdate(
+      _id,
+      { $pull: { likes: userId } },
+      { new: true }
+    );
+    res.status(200).json(creation);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error });
+  }
+};
