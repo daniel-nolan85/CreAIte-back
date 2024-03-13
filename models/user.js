@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema(
       url: String,
       public_id: String,
     },
+    subscription: {},
   },
   { timestamps: true }
 );

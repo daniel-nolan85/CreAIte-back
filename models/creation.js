@@ -7,11 +7,11 @@ const creationSchema = new mongoose.Schema(
     createdBy: { type: ObjectId, ref: 'User', required: true },
     prompt: { type: String, required: true },
     photo: { type: String, required: true },
+    imageSize: { type: String, required: true },
     caption: { type: String },
     keywords: { type: String },
     sharing: { type: Boolean, default: true },
-    resolution: { type: String },
-    downloads: { type: Number },
+    downloads: { type: Number, default: 0 },
     likes: [{ type: ObjectId, ref: 'User' }],
   },
   { timestamps: true }

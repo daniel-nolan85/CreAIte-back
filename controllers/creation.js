@@ -15,12 +15,12 @@ const openai = new OpenAIApi({
 });
 
 export const createImage = async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, imageSize } = req.body;
   try {
     const aiResponse = await openai.images.generate({
       prompt,
       n: 1,
-      size: '1024x1024',
+      size: imageSize,
       response_format: 'b64_json',
     });
     const image = aiResponse.data[0].b64_json;
@@ -76,7 +76,7 @@ export const createKeywords = async (req, res) => {
 
 export const saveCreation = async (req, res) => {
   const { createdBy, prompt, photo, caption, keywords } = req.body.form;
-  const { sharing } = req.body;
+  const { sharing, imageSize } = req.body;
   try {
     const photoUrl = await cloudinary.uploader.upload(photo);
     const newCreation = await Creation.create({
@@ -86,6 +86,7 @@ export const saveCreation = async (req, res) => {
       caption,
       keywords,
       sharing,
+      imageSize,
     });
     res.status(201).json({ success: true, data: newCreation });
   } catch (error) {
