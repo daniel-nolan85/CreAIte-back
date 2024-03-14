@@ -69,3 +69,18 @@ export const currentUser = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+export const confirmUserEmail = async (req, res) => {
+  const { _id, email } = req.body;
+  try {
+    const user = await User.findOne({ _id, email });
+    if (user) {
+      return res.json({ success: true });
+    } else {
+      return res.json({ success: false, error: 'Email verification failed' });
+    }
+  } catch (error) {
+    console.error('Error confirming email:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
