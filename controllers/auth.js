@@ -6,6 +6,12 @@ export const createUser = async (req, res) => {
     const newUser = await new User({
       name,
       email,
+      subscription: {
+        plan: 'free',
+        startDate: new Date(),
+        cost: '0.00',
+        imagesRemaining: 5,
+      },
     }).save();
     res.json(newUser);
   } catch (err) {
@@ -23,7 +29,9 @@ export const loginUser = async (req, res) => {
         $set: { lastLogin: new Date(Date.now()) },
       },
       { new: true }
-    ).select(`_id name email lastLogin bio profileImage coverImage`);
+    ).select(
+      `_id name email lastLogin bio profileImage coverImage subscription`
+    );
     res.json(user);
   } catch (err) {
     res.status(400);
@@ -35,12 +43,18 @@ export const googleUser = async (req, res) => {
   const { name, email } = req.body;
   try {
     let user = await User.findOne({ email }).select(
-      `_id name email lastLogin bio profileImage coverImage`
+      `_id name email lastLogin bio profileImage coverImage subscription`
     );
     if (!user) {
       user = await new User({
         name,
         email,
+        subscription: {
+          plan: 'free',
+          startDate: new Date(),
+          cost: '0.00',
+          imagesRemaining: 5,
+        },
       }).save();
     } else {
       user = await User.findOneAndUpdate(
@@ -49,7 +63,9 @@ export const googleUser = async (req, res) => {
           $set: { lastLogin: new Date(Date.now()) },
         },
         { new: true }
-      ).select(`_id name email lastLogin bio profileImage coverImage`);
+      ).select(
+        `_id name email lastLogin bio profileImage coverImage subscription`
+      );
     }
     res.json(user);
   } catch (err) {
@@ -59,7 +75,6 @@ export const googleUser = async (req, res) => {
 };
 
 export const currentUser = async (req, res) => {
-  console.log('currentUser =>', req.body);
   const { email } = req.body;
   try {
     const user = await User.findOne({ email }).exec();

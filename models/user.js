@@ -20,7 +20,13 @@ const userSchema = new mongoose.Schema(
       url: String,
       public_id: String,
     },
-    subscription: {},
+    subscription: {
+      plan: { type: String, text: true, required: true },
+      startDate: { type: Date },
+      expiry: { type: Date },
+      cost: String,
+      imagesRemaining: Number,
+    },
   },
   { timestamps: true }
 );

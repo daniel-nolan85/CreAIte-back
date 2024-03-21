@@ -64,3 +64,30 @@ export const updateCoverImage = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+export const updateSubscription = async (req, res) => {
+  const { _id, amount } = req.body;
+  try {
+    const expiryDate = new Date();
+    expiryDate.setDate(expiryDate.getDate() + 30);
+
+    const user = await User.findByIdAndUpdate(
+      _id,
+      {
+        $set: {
+          'subscription.plan': amount === 1499 ? 'deluxe' : 'premium',
+          'subscription.startDate': new Date(),
+          'subscription.cost': amount === 1499 ? '14.99' : '34.99',
+          'subscription.imagesRemaining': amount === 1499 ? 100 : 200,
+          'subscription.expiry': expiryDate,
+        },
+      },
+      { new: true }
+    );
+    console.log({ user });
+    res.json(user);
+  } catch (error) {
+    console.error('Error updating image:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
