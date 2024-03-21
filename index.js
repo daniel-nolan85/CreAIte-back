@@ -3,6 +3,9 @@ import * as dotenv from 'dotenv';
 import cors from 'cors';
 import mongoose from 'mongoose';
 import { readdirSync } from 'fs';
+import { scheduleJob } from 'node-schedule';
+
+import { updateSubscriptions } from './controllers/scheduling.js';
 
 dotenv.config();
 
@@ -26,3 +29,7 @@ for (const file of routeFiles) {
 const server = app.listen(port, () =>
   console.log(`Server is running on port ${port}`)
 );
+
+const dailyTasks = scheduleJob('*/1 * * * *', () => {
+  updateSubscriptions();
+});

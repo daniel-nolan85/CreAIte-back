@@ -26,6 +26,8 @@ const userSchema = new mongoose.Schema(
       expiry: { type: Date },
       cost: String,
       imagesRemaining: Number,
+      subscriptionId: String,
+      cancelled: { type: Boolean, default: false },
     },
   },
   { timestamps: true }

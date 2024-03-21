@@ -66,10 +66,10 @@ export const updateCoverImage = async (req, res) => {
 };
 
 export const updateSubscription = async (req, res) => {
-  const { _id, amount } = req.body;
+  const { _id, amount, subscriptionId } = req.body;
   try {
     const expiryDate = new Date();
-    expiryDate.setDate(expiryDate.getDate() + 30);
+    expiryDate.setMonth(expiryDate.getMonth() + 1);
 
     const user = await User.findByIdAndUpdate(
       _id,
@@ -80,11 +80,12 @@ export const updateSubscription = async (req, res) => {
           'subscription.cost': amount === 1499 ? '14.99' : '34.99',
           'subscription.imagesRemaining': amount === 1499 ? 100 : 200,
           'subscription.expiry': expiryDate,
+          'subscription.subscriptionId': subscriptionId,
+          'subscription.cancelled': false,
         },
       },
       { new: true }
     );
-    console.log({ user });
     res.json(user);
   } catch (error) {
     console.error('Error updating image:', error.message);
