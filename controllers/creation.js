@@ -1,7 +1,7 @@
-import * as dotenv from 'dotenv';
 import { v2 as cloudinary } from 'cloudinary';
 import OpenAIApi from 'openai';
 import Creation from '../models/creation.js';
+import User from '../models/user.js';
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -15,29 +15,38 @@ const openai = new OpenAIApi({
 });
 
 export const createImage = async (req, res) => {
-  const { prompt, imageSize } = req.body;
+  const { _id, prompt, imageSize, plan, imagesRemaining } = req.body;
+  console.log({ _id, prompt, imageSize, plan, imagesRemaining });
   try {
-    const aiResponse = await openai.images.generate({
-      prompt,
-      n: 1,
-      size: imageSize,
-      response_format: 'b64_json',
-    });
-    const image = aiResponse.data[0].b64_json;
-    const revisedPrompt = aiResponse.data[0].revised_prompt;
-    res.status(200).json({ photo: image, revisedPrompt });
+    if (imagesRemaining > 0) {
+      const aiResponse = await openai.images.generate({
+        model: plan === 'free' ? 'dall-e-2' : 'dall-e-3',
+        prompt,
+        n: 1,
+        size: imageSize,
+        response_format: 'b64_json',
+      });
+      const image = aiResponse.data[0].b64_json;
+      const user = await User.findById(_id);
+      user.subscription.imagesRemaining -= 1;
+      await user.save();
+      res.json({ photo: image, user });
+    } else {
+      res.json({ message: 'No remaining images for generation' });
+    }
   } catch (error) {
     console.error(error);
+    console.log({ error });
     res.status(500).send(error?.response.data.error.message);
   }
 };
 
 export const createCaption = async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, plan } = req.body;
   try {
     const message = `Create a caption for an image that has previously been generated using this prompt: ${prompt}`;
     const aiResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0613',
+      model: plan === 'premium' ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: message }],
       temperature: 0.7,
       max_tokens: 256,
@@ -54,11 +63,11 @@ export const createCaption = async (req, res) => {
 };
 
 export const createKeywords = async (req, res) => {
-  const { prompt } = req.body;
+  const { prompt, plan } = req.body;
   try {
     const message = `Provide some comma separated keywords that will relate to an image that has previously been generated using this prompt: ${prompt}`;
     const aiResponse = await openai.chat.completions.create({
-      model: 'gpt-3.5-turbo-0613',
+      model: plan === 'premium' ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: message }],
       temperature: 0.7,
       max_tokens: 256,
@@ -76,7 +85,7 @@ export const createKeywords = async (req, res) => {
 
 export const saveCreation = async (req, res) => {
   const { createdBy, prompt, photo, caption, keywords } = req.body.form;
-  const { sharing, imageSize } = req.body;
+  const { sharing, imageSize, plan } = req.body;
   try {
     const photoUrl = await cloudinary.uploader.upload(photo);
     const newCreation = await Creation.create({
@@ -87,6 +96,7 @@ export const saveCreation = async (req, res) => {
       keywords,
       sharing,
       imageSize,
+      model: plan === 'free' ? 'dall-e-2' : 'dall-e-3',
     });
     res.status(201).json({ success: true, data: newCreation });
   } catch (error) {
