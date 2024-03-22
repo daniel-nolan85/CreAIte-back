@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  createPrompt,
   createImage,
   createCaption,
   createKeywords,
@@ -13,6 +14,7 @@ import {
 
 const router = express.Router();
 
+router.post('/create-prompt', createPrompt);
 router.post('/create-image', createImage);
 router.post('/create-caption', createCaption);
 router.post('/create-keywords', createKeywords);

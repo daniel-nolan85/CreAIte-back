@@ -14,6 +14,27 @@ const openai = new OpenAIApi({
   dangerouslyAllowBrowser: true,
 });
 
+export const createPrompt = async (req, res) => {
+  const { plan } = req.body;
+  try {
+    const message = `Generate a quirky and imaginative prompt that can then be used for creating an image.`;
+    const aiResponse = await openai.chat.completions.create({
+      model: plan === 'premium' ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo',
+      messages: [{ role: 'user', content: message }],
+      temperature: 0.7,
+      max_tokens: 256,
+      top_p: 1,
+      frequency_penalty: 0,
+      presence_penalty: 0,
+    });
+    const prompt = aiResponse.choices[0].message.content;
+    res.status(200).json({ prompt });
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error?.response.data.error.message);
+  }
+};
+
 export const createImage = async (req, res) => {
   const { _id, prompt, imageSize, plan, imagesRemaining } = req.body;
   console.log({ _id, prompt, imageSize, plan, imagesRemaining });
