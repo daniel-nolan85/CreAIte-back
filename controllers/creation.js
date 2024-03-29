@@ -37,7 +37,6 @@ export const createPrompt = async (req, res) => {
 
 export const createImage = async (req, res) => {
   const { _id, prompt, imageSize, plan, imagesRemaining } = req.body;
-  console.log({ _id, prompt, imageSize, plan, imagesRemaining });
   try {
     if (imagesRemaining > 0) {
       const aiResponse = await openai.images.generate({
@@ -57,7 +56,6 @@ export const createImage = async (req, res) => {
     }
   } catch (error) {
     console.error(error);
-    console.log({ error });
     res.status(500).send(error?.response.data.error.message);
   }
 };

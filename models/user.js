@@ -2,6 +2,10 @@ import mongoose from 'mongoose';
 
 const userSchema = new mongoose.Schema(
   {
+    role: {
+      type: String,
+      default: 'subscriber',
+    },
     name: { type: String, text: true, required: true },
     email: {
       type: String,

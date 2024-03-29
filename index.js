@@ -4,7 +4,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import { readdirSync } from 'fs';
 import { scheduleJob } from 'node-schedule';
-
+import { Server } from 'socket.io';
 import { updateSubscriptions } from './controllers/scheduling.js';
 
 dotenv.config();
@@ -30,6 +30,60 @@ const server = app.listen(port, () =>
   console.log(`Server is running on port ${port}`)
 );
 
-const dailyTasks = scheduleJob('*/1 * * * *', () => {
-  updateSubscriptions();
+// const dailyTasks = scheduleJob('*/1 * * * *', () => {
+//   updateSubscriptions();
+// });
+
+const io = new Server(server, {
+  path: '/socket.io',
+  pingTimeout: 60000,
+  cors: {
+    origins: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-type'],
+  },
+  maxHttpBufferSize: 1e8,
+  secure: true,
+});
+
+let users = [];
+
+const addUser = (userId, socketId) => {
+  !users.some((user) => user.userId === userId) &&
+    users.push({ userId, socketId });
+};
+
+const removeUser = (socketId) => {
+  users = users.filter((user) => user.socketId !== socketId);
+};
+
+const getUser = (userId) => {
+  console.log({ users });
+
+  return users.find((user) => user.userId === userId);
+};
+
+io.on('connection', (socket) => {
+  console.log('connected to socket.io');
+  socket.on('addUser', (userId) => {
+    addUser(userId, socket.id);
+    io.emit('getUsers', users);
+  });
+  socket.on('sendMessage', ({ senderId, receiverId, message }) => {
+    console.log({ senderId, receiverId, message });
+    const user = getUser(receiverId);
+    console.log({ user });
+    if (user) {
+      io.to(user.socketId).emit('getMessage', {
+        senderId,
+        message,
+      });
+    }
+  });
+
+  socket.on('disconnect', () => {
+    console.log('a user disconnected from socket.io');
+    removeUser(socket.id);
+    io.emit('getUsers', users);
+  });
 });
