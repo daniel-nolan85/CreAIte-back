@@ -15,11 +15,12 @@ const openai = new OpenAIApi({
 });
 
 export const createPrompt = async (req, res) => {
-  const { plan } = req.body;
+  const { gptVersion } = req.body;
   try {
     const message = `Generate a quirky and imaginative prompt that can then be used for creating an image.`;
     const aiResponse = await openai.chat.completions.create({
-      model: plan === 'premium' ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo',
+      model:
+        gptVersion === 'GPT-4 Turbo' ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: message }],
       temperature: 0.7,
       max_tokens: 256,
@@ -36,11 +37,11 @@ export const createPrompt = async (req, res) => {
 };
 
 export const createImage = async (req, res) => {
-  const { _id, prompt, imageSize, plan, imagesRemaining } = req.body;
+  const { _id, prompt, imageSize, dalleVersion, imagesRemaining } = req.body;
   try {
     if (imagesRemaining > 0) {
       const aiResponse = await openai.images.generate({
-        model: plan === 'free' ? 'dall-e-2' : 'dall-e-3',
+        model: dalleVersion === 'Dall-E-2' ? 'dall-e-2' : 'dall-e-3',
         prompt,
         n: 1,
         size: imageSize,
@@ -61,11 +62,12 @@ export const createImage = async (req, res) => {
 };
 
 export const createCaption = async (req, res) => {
-  const { prompt, plan } = req.body;
+  const { prompt, gptVersion } = req.body;
   try {
     const message = `Create a caption for an image that has previously been generated using this prompt: ${prompt}`;
     const aiResponse = await openai.chat.completions.create({
-      model: plan === 'premium' ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo',
+      model:
+        gptVersion === 'GPT-4 Turbo' ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: message }],
       temperature: 0.7,
       max_tokens: 256,
@@ -82,11 +84,12 @@ export const createCaption = async (req, res) => {
 };
 
 export const createKeywords = async (req, res) => {
-  const { prompt, plan } = req.body;
+  const { prompt, gptVersion } = req.body;
   try {
     const message = `Provide some comma separated keywords that will relate to an image that has previously been generated using this prompt: ${prompt}`;
     const aiResponse = await openai.chat.completions.create({
-      model: plan === 'premium' ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo',
+      model:
+        gptVersion === 'GPT-4 Turbo' ? 'gpt-4-turbo-preview' : 'gpt-3.5-turbo',
       messages: [{ role: 'user', content: message }],
       temperature: 0.7,
       max_tokens: 256,
@@ -104,7 +107,7 @@ export const createKeywords = async (req, res) => {
 
 export const saveCreation = async (req, res) => {
   const { createdBy, prompt, photo, caption, keywords } = req.body.form;
-  const { sharing, imageSize, plan } = req.body;
+  const { sharing, imageSize, dalleVersion } = req.body;
   try {
     const photoUrl = await cloudinary.uploader.upload(photo);
     const newCreation = await Creation.create({
@@ -115,7 +118,7 @@ export const saveCreation = async (req, res) => {
       keywords,
       sharing,
       imageSize,
-      model: plan === 'free' ? 'dall-e-2' : 'dall-e-3',
+      model: dalleVersion === 'Dall-E-2' ? 'dall-e-2' : 'dall-e-3',
     });
     res.status(201).json({ success: true, data: newCreation });
   } catch (error) {

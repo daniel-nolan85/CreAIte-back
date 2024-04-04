@@ -66,26 +66,46 @@ export const updateCoverImage = async (req, res) => {
 };
 
 export const updateSubscription = async (req, res) => {
-  const { _id, amount, subscriptionId } = req.body;
+  const { _id, amount, customOptions, subscriptionId } = req.body;
+  console.log({ customOptions });
   try {
     const expiryDate = new Date();
     expiryDate.setMonth(expiryDate.getMonth() + 1);
 
+    const subscriptionUpdates = {
+      'subscription.startDate': new Date(),
+      'subscription.cost': (amount / 100).toFixed(2),
+      'subscription.expiry': expiryDate,
+      'subscription.subscriptionId': subscriptionId,
+      'subscription.cancelled': false,
+    };
+
+    if (customOptions) {
+      subscriptionUpdates['subscription.plan'] = 'custom';
+      subscriptionUpdates['subscription.imagesRemaining'] =
+        customOptions.numCreAItions;
+      subscriptionUpdates['subscription.dalleVersion'] =
+        customOptions.dallEVersion;
+      subscriptionUpdates['subscription.gptVersion'] = customOptions.gptVersion;
+      subscriptionUpdates['subscription.customerSupport'] =
+        customOptions.customerSupport;
+    } else {
+      subscriptionUpdates['subscription.plan'] =
+        amount === 1999 ? 'deluxe' : 'premium';
+      subscriptionUpdates['subscription.imagesRemaining'] =
+        amount === 1999 ? 100 : 200;
+      subscriptionUpdates['subscription.dalleVersion'] = 'Dall-E-3';
+      subscriptionUpdates['subscription.gptVersion'] =
+        amount === 1999 ? 'GPT-3.5' : 'GPT-4 Turbo';
+      subscriptionUpdates['subscription.customerSupport'] = 'Priority';
+    }
+
     const user = await User.findByIdAndUpdate(
       _id,
-      {
-        $set: {
-          'subscription.plan': amount === 1499 ? 'deluxe' : 'premium',
-          'subscription.startDate': new Date(),
-          'subscription.cost': amount === 1499 ? '14.99' : '34.99',
-          'subscription.imagesRemaining': amount === 1499 ? 100 : 200,
-          'subscription.expiry': expiryDate,
-          'subscription.subscriptionId': subscriptionId,
-          'subscription.cancelled': false,
-        },
-      },
+      { $set: subscriptionUpdates },
       { new: true }
     );
+
     res.json(user);
   } catch (error) {
     console.error('Error updating image:', error.message);

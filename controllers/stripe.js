@@ -9,7 +9,7 @@ export const createStripeSubscription = async (req, res) => {
     const user = await User.findById(_id);
     const existingSubscriptionId = user.subscription.subscriptionId;
     if (existingSubscriptionId) {
-      await stripe.subscriptions.del(existingSubscriptionId);
+      await stripe.subscriptions.cancel(existingSubscriptionId);
     }
 
     const customer = await stripe.customers.create({
