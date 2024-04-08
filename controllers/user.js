@@ -67,7 +67,6 @@ export const updateCoverImage = async (req, res) => {
 
 export const updateSubscription = async (req, res) => {
   const { _id, amount, customOptions, subscriptionId } = req.body;
-  console.log({ customOptions });
   try {
     const expiryDate = new Date();
     expiryDate.setMonth(expiryDate.getMonth() + 1);

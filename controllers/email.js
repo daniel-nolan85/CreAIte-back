@@ -10,7 +10,6 @@ export const checkRecaptcha = async (req, res) => {
       `https://www.google.com/recaptcha/api/siteverify?secret=${secret}&response=${token}`
     )
     .then((response) => {
-      console.log({ response });
       res.json(response.data);
     })
     .catch((err) => {

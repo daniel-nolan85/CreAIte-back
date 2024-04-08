@@ -127,6 +127,16 @@ export const saveCreation = async (req, res) => {
   }
 };
 
+export const fetchAllCreations = async (req, res) => {
+  try {
+    const creations = await Creation.find().populate('createdBy', 'name');
+    res.status(200).json(creations);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error });
+  }
+};
+
 export const fetchSharedCreations = async (req, res) => {
   try {
     const creations = await Creation.find({ sharing: true }).populate(
@@ -149,6 +159,20 @@ export const fetchUserCreations = async (req, res) => {
     );
     const likedCreations = await Creation.find({ likes: { $in: [_id] } });
     res.status(200).json({ creations, likedCreations });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error });
+  }
+};
+
+export const fetchRandomCreations = async (req, res) => {
+  try {
+    const randomCreations = await Creation.aggregate([
+      { $sample: { size: 16 } }, // Select a random sample of 16 documents
+      { $project: { _id: 0, id: '$_id', src: '$photo' } }, // Project only the necessary fields
+    ]);
+
+    res.status(200).json(randomCreations);
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: error });
