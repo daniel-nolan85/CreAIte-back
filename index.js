@@ -49,8 +49,17 @@ const io = new Server(server, {
 let users = [];
 
 const addUser = (userId, socketId) => {
-  !users.some((user) => user.userId === userId) &&
-    users.push({ userId, socketId });
+  // Check if user with userId already exists in the users array
+  const existingUserIndex = users.findIndex((user) => user.userId === userId);
+
+  // If user with userId already exists, remove the existing entry
+  if (existingUserIndex !== -1) {
+    users.splice(existingUserIndex, 1);
+  }
+
+  // Add the new entry to the users array
+  users.push({ userId, socketId });
+  console.log({ users });
 };
 
 const removeUser = (socketId) => {
@@ -58,24 +67,22 @@ const removeUser = (socketId) => {
 };
 
 const getUser = (userId) => {
-  console.log({ users });
-
   return users.find((user) => user.userId === userId);
 };
 
 io.on('connection', (socket) => {
   console.log('connected to socket.io');
   socket.on('addUser', (userId) => {
+    console.log(`${userId} ${socket.id} has been added`);
     addUser(userId, socket.id);
     io.emit('getUsers', users);
   });
-  socket.on('sendMessage', ({ senderId, receiverId, message }) => {
-    console.log({ senderId, receiverId, message });
+  socket.on('sendMessage', ({ sender, receiverId, message }) => {
     const user = getUser(receiverId);
-    console.log({ user });
     if (user) {
+      console.log({ user });
       io.to(user.socketId).emit('getMessage', {
-        senderId,
+        sender,
         message,
       });
     }
