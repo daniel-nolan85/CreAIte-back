@@ -1,8 +1,9 @@
 import express from 'express';
-import { fetchData } from '../controllers/admin.js';
+import { fetchData, fetchAllUsers } from '../controllers/admin.js';
 
 const router = express.Router();
 
 router.get('/fetch-data', fetchData);
+router.get('/fetch-users', fetchAllUsers);
 
 export default router;

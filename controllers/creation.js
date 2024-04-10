@@ -180,10 +180,15 @@ export const fetchRandomCreations = async (req, res) => {
 };
 
 export const downloadCreation = async (req, res) => {
-  const { _id } = req.body;
+  const { _id, userId } = req.body;
   try {
     const creation = await Creation.findByIdAndUpdate(
       _id,
+      { $inc: { downloads: 1 } },
+      { new: true }
+    );
+    const user = await User.findByIdAndUpdate(
+      userId,
       { $inc: { downloads: 1 } },
       { new: true }
     );
@@ -202,6 +207,11 @@ export const likeCreation = async (req, res) => {
       { $addToSet: { likes: userId } },
       { new: true }
     ).populate('likes', '_id name profileImage');
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $inc: { likes: 1 } },
+      { new: true }
+    );
     res.status(200).json(creation);
   } catch (error) {
     console.error(error);
@@ -215,6 +225,11 @@ export const unlikeCreation = async (req, res) => {
     const creation = await Creation.findByIdAndUpdate(
       _id,
       { $pull: { likes: userId } },
+      { new: true }
+    );
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { $inc: { likes: -1 } },
       { new: true }
     );
     res.status(200).json(creation);
