@@ -1,4 +1,5 @@
 import User from '../models/user.js';
+import Subscriber from '../models/subscriber.js';
 
 export const fetchUser = async (req, res) => {
   const { _id } = req.body;
@@ -109,5 +110,22 @@ export const updateSubscription = async (req, res) => {
   } catch (error) {
     console.error('Error updating image:', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const captureUserEmail = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const existingSubscriber = await Subscriber.findOne({ email });
+    if (existingSubscriber) {
+      return res.json({ message: 'Email already subscribed' });
+    }
+
+    const newSubscriber = await new Subscriber({
+      email,
+    }).save();
+    res.status(201).json(newSubscriber);
+  } catch (err) {
+    res.status(500).json({ message: 'Internal server error' });
   }
 };

@@ -168,8 +168,8 @@ export const fetchUserCreations = async (req, res) => {
 export const fetchRandomCreations = async (req, res) => {
   try {
     const randomCreations = await Creation.aggregate([
-      { $sample: { size: 16 } }, // Select a random sample of 16 documents
-      { $project: { _id: 0, id: '$_id', src: '$photo' } }, // Project only the necessary fields
+      { $sample: { size: 16 } },
+      { $project: { _id: 0, id: '$_id', src: '$photo' } },
     ]);
 
     res.status(200).json(randomCreations);
