@@ -3,11 +3,10 @@ import {
   createStripeSubscription,
   cancelStripeSubscription,
 } from '../controllers/stripe.js';
-import { authCheck } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.post('/create-stripe-subscription', authCheck, createStripeSubscription);
-router.post('/cancel-stripe-subscription', authCheck, cancelStripeSubscription);
+router.post('/create-stripe-subscription', createStripeSubscription);
+router.post('/cancel-stripe-subscription', cancelStripeSubscription);
 
 export default router;
