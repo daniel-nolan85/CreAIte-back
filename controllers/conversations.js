@@ -2,6 +2,21 @@ import Conversation from '../models/conversation.js';
 
 const adminId = process.env.ADMIN_ID;
 
+// export const conversation = async (req, res) => {
+//   const { senderId, receiverId } = req.body;
+
+//   const newConversation = new Conversation({
+//     members: [senderId, receiverId],
+//   });
+
+//   try {
+//     const savedConversation = await newConversation.save();
+//     res.status(200).json(savedConversation);
+//   } catch (err) {
+//     res.status(500).json(err);
+//   }
+// };
+
 export const fetchConversations = async (req, res) => {
   try {
     const conversations = await Conversation.find({}).populate(
