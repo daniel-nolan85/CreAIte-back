@@ -85,6 +85,17 @@ export const currentUser = async (req, res) => {
   }
 };
 
+export const currentAdmin = async (req, res) => {
+  const { email } = req.user;
+  try {
+    const user = await User.findOne({ email }).exec();
+    res.json(user);
+  } catch (error) {
+    console.error('Error fetching user:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
 export const confirmUserEmail = async (req, res) => {
   const { _id, email } = req.body;
   try {

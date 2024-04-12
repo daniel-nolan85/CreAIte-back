@@ -4,6 +4,7 @@ import {
   uploadMediaToCloudinary,
   destroyMediaFromCloudinary,
 } from '../controllers/cloudinary.js';
+import { authCheck } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -12,6 +13,6 @@ router.post(
   formidable({ maxFileSize: 5 * 1024 * 1024 }),
   uploadMediaToCloudinary
 );
-router.post('/destroy-media', destroyMediaFromCloudinary);
+router.post('/destroy-media', authCheck, destroyMediaFromCloudinary);
 
 export default router;
