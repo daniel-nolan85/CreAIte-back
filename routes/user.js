@@ -11,7 +11,7 @@ import { authCheck } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.post('/fetch-user', authCheck, fetchUser);
+router.post('/fetch-user', fetchUser);
 router.put('/update-profile', authCheck, updateProfile);
 router.put('/update-profile-image', authCheck, updateProfileImage);
 router.put('/update-cover-image', authCheck, updateCoverImage);

@@ -9,6 +9,9 @@ import {
   fetchSharedCreations,
   fetchUserCreations,
   fetchRandomCreations,
+  fetchUserSharedCreations,
+  fetchUserPrivateCreations,
+  fetchUserLikedCreations,
   downloadCreation,
   likeCreation,
   unlikeCreation,
@@ -23,9 +26,20 @@ router.post('/create-caption', authCheck, createCaption);
 router.post('/create-keywords', authCheck, createKeywords);
 router.post('/save-creation', authCheck, saveCreation);
 router.get('/fetch-all-creations', fetchAllCreations);
-router.get('/fetch-shared-creations', fetchSharedCreations);
-router.post('/fetch-user-creations', authCheck, fetchUserCreations);
+router.post('/fetch-shared-creations', fetchSharedCreations);
+router.post('/fetch-user-creations', fetchUserCreations);
 router.get('/fetch-random-creations', fetchRandomCreations);
+router.post(
+  '/fetch-user-shared-creations',
+  authCheck,
+  fetchUserSharedCreations
+);
+router.post(
+  '/fetch-user-private-creations',
+  authCheck,
+  fetchUserPrivateCreations
+);
+router.post('/fetch-user-liked-creations', authCheck, fetchUserLikedCreations);
 router.put('/download-creation', downloadCreation);
 router.put('/like-creation', authCheck, likeCreation);
 router.put('/unlike-creation', authCheck, unlikeCreation);

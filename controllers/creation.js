@@ -129,7 +129,10 @@ export const saveCreation = async (req, res) => {
 
 export const fetchAllCreations = async (req, res) => {
   try {
-    const creations = await Creation.find().populate('createdBy', 'name');
+    const creations = await Creation.find().populate(
+      'createdBy',
+      'name profileImage'
+    );
     res.status(200).json(creations);
   } catch (error) {
     console.error(error);
@@ -138,12 +141,17 @@ export const fetchAllCreations = async (req, res) => {
 };
 
 export const fetchSharedCreations = async (req, res) => {
+  const { page } = req.body;
+  const limit = 20;
+  const skip = (page - 1) * limit;
   try {
-    const creations = await Creation.find({ sharing: true }).populate(
-      'createdBy',
-      'name'
-    );
-    res.status(200).json(creations);
+    const creations = await Creation.find({ sharing: true })
+      .sort({ createdAt: -1 })
+      .populate('createdBy', 'name profileImage')
+      .skip(skip)
+      .limit(limit);
+    const totalCount = await Creation.countDocuments({ sharing: true });
+    res.status(200).json({ creations, totalCount });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: error });
@@ -151,14 +159,16 @@ export const fetchSharedCreations = async (req, res) => {
 };
 
 export const fetchUserCreations = async (req, res) => {
-  const { _id } = req.body;
+  const { _id, page } = req.body;
+  const limit = 20;
+  const skip = (page - 1) * limit;
   try {
-    const creations = await Creation.find({ createdBy: _id }).populate(
-      'createdBy',
-      'name'
-    );
-    const likedCreations = await Creation.find({ likes: { $in: [_id] } });
-    res.status(200).json({ creations, likedCreations });
+    const creations = await Creation.find({ createdBy: _id })
+      .populate('createdBy', 'name profileImage')
+      .skip(skip)
+      .limit(limit);
+    const totalCount = await Creation.countDocuments({ createdBy: _id });
+    res.status(200).json({ creations, totalCount });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: error });
@@ -173,6 +183,66 @@ export const fetchRandomCreations = async (req, res) => {
     ]);
 
     res.status(200).json(randomCreations);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error });
+  }
+};
+
+export const fetchUserSharedCreations = async (req, res) => {
+  const { _id, page } = req.body;
+  const limit = 20;
+  const skip = (page - 1) * limit;
+  try {
+    const creations = await Creation.find({
+      $and: [{ createdBy: _id }, { sharing: true }],
+    })
+      .populate('createdBy', 'name profileImage')
+      .skip(skip)
+      .limit(limit);
+    const totalCount = await Creation.countDocuments({ createdBy: _id });
+    const totalShared = await Creation.countDocuments({
+      $and: [{ createdBy: _id }, { sharing: true }],
+    });
+    res.status(200).json({ creations, totalCount, totalShared });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error });
+  }
+};
+
+export const fetchUserPrivateCreations = async (req, res) => {
+  const { _id, page } = req.body;
+  const limit = 20;
+  const skip = (page - 1) * limit;
+  try {
+    const creations = await Creation.find({
+      $and: [{ createdBy: _id }, { sharing: false }],
+    })
+      .populate('createdBy', 'name profileImage')
+      .skip(skip)
+      .limit(limit);
+    const totalPrivate = await Creation.countDocuments({
+      $and: [{ createdBy: _id }, { sharing: false }],
+    });
+    res.status(200).json({ creations, totalPrivate });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error });
+  }
+};
+
+export const fetchUserLikedCreations = async (req, res) => {
+  const { _id, page } = req.body;
+  const limit = 20;
+  const skip = (page - 1) * limit;
+  try {
+    const creations = await Creation.find({ likes: { $in: [_id] } })
+      .populate('createdBy', 'name profileImage')
+      .skip(skip)
+      .limit(limit);
+    const totalLiked = await Creation.countDocuments({ likes: { $in: [_id] } });
+    res.status(200).json({ creations, totalLiked });
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: error });
