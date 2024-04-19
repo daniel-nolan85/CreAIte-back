@@ -77,6 +77,7 @@ io.on('connection', (socket) => {
       io.to(user.socketId).emit('getMessage', {
         sender,
         message,
+        receiverId,
       });
     }
   });
