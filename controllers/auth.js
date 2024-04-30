@@ -110,3 +110,19 @@ export const confirmUserEmail = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
+export const checkUserExists = async (req, res) => {
+  const { email } = req.body;
+  console.log({ email });
+  try {
+    const user = await User.findOne({ email });
+    if (user) {
+      return res.json({ success: true });
+    } else {
+      return res.json({ success: false, error: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Error finding user:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};

@@ -1,6 +1,5 @@
 import axios from 'axios';
 import nodemailer from 'nodemailer';
-import User from '../models/user.js';
 
 export const checkRecaptcha = async (req, res) => {
   const { secret, token } = req.body;

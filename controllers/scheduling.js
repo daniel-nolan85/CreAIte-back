@@ -1,29 +1,24 @@
+import Stripe from 'stripe';
 import User from '../models/user.js';
 
 export const updateSubscriptions = async (req, res) => {
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   try {
     const users = await User.find({
       'subscription.expiry': { $lte: new Date() },
     });
-
     for (const user of users) {
-      const paymentIntent = await stripe.paymentIntents.retrieve(
+      const subscription = await stripe.subscriptions.retrieve(
         user.subscription.subscriptionId
       );
-
-      if (paymentIntent.status === 'succeeded') {
+      if (subscription.status === 'active') {
         const expiryDate = new Date(user.subscription.expiry);
         expiryDate.setMonth(expiryDate.getMonth() + 1);
-
-        user.subscription.imagesRemaining = 100;
-
+        user.subscription.expiry = expiryDate;
+        user.subscription.imagesRemaining = user.monthlyAllocation;
         await user.save();
-
-        // Optionally, notify the user about the subscription renewal
-        // Send email or push notification
       } else {
-        console.error('Payment failed for user:', user._id);
-        // Log the error, notify the user, or take other actions as needed
+        console.error('User has cancelled their subscription', user._id);
       }
     }
     console.log('Subscription renewal task completed successfully.');

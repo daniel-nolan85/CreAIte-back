@@ -6,6 +6,7 @@ import {
   currentUser,
   currentAdmin,
   confirmUserEmail,
+  checkUserExists,
 } from '../controllers/auth.js';
 import { authCheck, adminCheck } from '../middleware/auth.js';
 
@@ -17,5 +18,6 @@ router.post('/google-user', authCheck, googleUser);
 router.post('/current-user', authCheck, currentUser);
 router.post('/current-admin', authCheck, adminCheck, currentAdmin);
 router.put('/confirm-user-email', authCheck, confirmUserEmail);
+router.post('/check-user-exists', checkUserExists);
 
 export default router;

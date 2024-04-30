@@ -30,9 +30,9 @@ const server = app.listen(port, () =>
   console.log(`Server is running on port ${port}`)
 );
 
-// const dailyTasks = scheduleJob('*/1 * * * *', () => {
-//   updateSubscriptions();
-// });
+const dailyTasks = scheduleJob('0 0 * * *', () => {
+  updateSubscriptions();
+});
 
 const io = new Server(server, {
   path: '/socket.io',

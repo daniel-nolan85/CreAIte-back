@@ -9,7 +9,7 @@ import { authCheck } from '../middleware/auth.js';
 
 const router = express.Router();
 
-router.post('/send-message', authCheck, sendMessage);
+router.post('/send-message', sendMessage);
 router.get('/fetch-messages/:conversationId', authCheck, conversationMessages);
 router.post('/increment-new-messages', incrementNewMessages);
 router.put('/clear-new-messages', clearNewMessages);

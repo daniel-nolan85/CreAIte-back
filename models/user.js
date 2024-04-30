@@ -36,6 +36,7 @@ const userSchema = new mongoose.Schema(
       subscriptionId: String,
       cancelled: { type: Boolean, default: false },
     },
+    monthlyAllocation: { type: Number, default: 0 },
     likes: { type: Number, default: 0 },
     downloads: { type: Number, default: 0 },
     newMessages: { type: Number, default: 0 },
