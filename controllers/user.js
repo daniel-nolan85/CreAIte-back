@@ -121,14 +121,14 @@ export const updateSubscription = async (req, res) => {
     let transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'nolancode20@gmail.com',
-        pass: process.env.GMAIL_AUTHORIZATION,
+        user: 'support@creaite.media',
+        pass: process.env.DREAMHOST_AUTHORIZATION,
       },
       secure: true,
     });
 
     let mailOptions = {
-      from: 'nolancode20@gmail.com',
+      from: 'support@creaite.media',
       to: user.email,
       subject: 'Thanks for subscribing to CreAIte',
       html: `

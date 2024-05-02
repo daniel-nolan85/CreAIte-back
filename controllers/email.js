@@ -22,18 +22,19 @@ export const sendUserEmail = async (req, res) => {
   const { name, email, subject, message } = form;
 
   try {
-    let transporter = nodemailer.createTransport({
-      service: 'gmail',
-      auth: {
-        user: 'nolancode20@gmail.com',
-        pass: process.env.GMAIL_AUTHORIZATION,
-      },
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.dreamhost.com',
+      port: 465,
       secure: true,
+      auth: {
+        user: 'support@creaite.media',
+        pass: process.env.DREAMHOST_AUTHORIZATION,
+      },
     });
 
-    let mailOptions = {
-      from: 'nolancode20@gmail.com',
-      to: 'nolancode20@gmail.com',
+    const mailOptions = {
+      from: 'support@creaite.media',
+      to: 'support@creaite.media',
       subject: subject,
       html: `
        <h3>Information</h3>

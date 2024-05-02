@@ -6,7 +6,7 @@ export const fetchConversations = async (req, res) => {
   try {
     const conversations = await Conversation.find({}).populate(
       'members',
-      '_id name profileImage'
+      '_id name profileImage subscription'
     );
     res.status(200).json(conversations);
   } catch (err) {
@@ -21,12 +21,15 @@ export const userConversation = async (req, res) => {
   try {
     let conversation = await Conversation.findOne({
       members: { $all: [userId, adminId] },
-    }).populate('members', '_id name profileImage');
+    }).populate('members', '_id name profileImage subscription');
 
     if (!conversation) {
       conversation = new Conversation({ members: [userId, adminId] });
       await conversation.save();
-      await conversation.populate('members', '_id name profileImage');
+      await conversation.populate(
+        'members',
+        '_id name profileImage subscription'
+      );
     }
 
     res.status(200).json(conversation);
