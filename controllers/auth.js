@@ -1,4 +1,6 @@
 import User from '../models/user.js';
+import Creation from '../models/creation.js';
+import admin from '../firebase/index.js';
 
 export const createUser = async (req, res) => {
   const { name, email } = req.body;
@@ -98,6 +100,7 @@ export const currentAdmin = async (req, res) => {
 
 export const confirmUserEmail = async (req, res) => {
   const { _id, email } = req.body;
+  console.log({ email });
   try {
     const user = await User.findOne({ _id, email });
     if (user) {
@@ -123,6 +126,27 @@ export const checkUserExists = async (req, res) => {
     }
   } catch (error) {
     console.error('Error finding user:', error.message);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+};
+
+export const deleteAccount = async (req, res) => {
+  const { _id } = req.body;
+  try {
+    const user = await User.findByIdAndDelete(_id).select('email');
+    const creaitions = await Creation.updateMany(
+      { createdBy: _id },
+      { $set: { sharing: true } }
+    );
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    const userRecord = await admin.auth().getUserByEmail(user.email);
+    const uid = userRecord.uid;
+    await admin.auth().deleteUser(uid);
+    res.json(user);
+  } catch (error) {
+    console.error('Error deleting user:', error.message);
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };

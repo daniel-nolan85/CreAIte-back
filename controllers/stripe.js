@@ -61,7 +61,6 @@ export const cancelStripeSubscription = async (req, res) => {
     const user = await User.findById(_id);
     user.subscription.cancelled = true;
     await user.save();
-    res.json(user);
 
     const transporter = nodemailer.createTransport({
       host: 'smtp.dreamhost.com',
@@ -95,9 +94,9 @@ export const cancelStripeSubscription = async (req, res) => {
 
     transporter.sendMail(mailOptions, (err, response) => {
       if (err) {
-        res.send(err);
+        res.status(500).send('Error sending email');
       } else {
-        res.send('Success');
+        res.json(user);
       }
     });
 

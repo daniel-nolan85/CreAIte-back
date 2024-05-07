@@ -116,8 +116,6 @@ export const updateSubscription = async (req, res) => {
       { new: true }
     );
 
-    res.json(user);
-
     let transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
@@ -164,9 +162,9 @@ export const updateSubscription = async (req, res) => {
 
     transporter.sendMail(mailOptions, (err, response) => {
       if (err) {
-        res.send(err);
+        res.status(500).send('Error sending email');
       } else {
-        res.send('Success');
+        res.json(user);
       }
     });
 
