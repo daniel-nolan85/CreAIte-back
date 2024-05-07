@@ -3,7 +3,7 @@ import User from '../models/user.js';
 import nodemailer from 'nodemailer';
 import moment from 'moment';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.LIVE_STRIPE_SECRET_KEY);
 
 export const createStripeSubscription = async (req, res) => {
   const { _id, name, email, amount, paymentMethodId } = req.body;

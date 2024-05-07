@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import User from '../models/user.js';
 import Creation from '../models/creation.js';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+const stripe = new Stripe(process.env.LIVE_STRIPE_SECRET_KEY);
 
 export const fetchData = async (req, res) => {
   try {

@@ -2,7 +2,7 @@ import Stripe from 'stripe';
 import User from '../models/user.js';
 
 export const updateSubscriptions = async (req, res) => {
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const stripe = new Stripe(process.env.LIVE_STRIPE_SECRET_KEY);
   try {
     const users = await User.find({
       'subscription.expiry': { $lte: new Date() },
