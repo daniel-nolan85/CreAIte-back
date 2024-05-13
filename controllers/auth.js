@@ -13,6 +13,9 @@ export const createUser = async (req, res) => {
         startDate: new Date(),
         cost: '0.00',
         imagesRemaining: 5,
+        customerSupport: 'Standard',
+        dalleVersion: 'Dall-E-2',
+        gptVersion: 'GPT-3.5',
       },
     }).save();
     res.json(newUser);
@@ -32,7 +35,7 @@ export const loginUser = async (req, res) => {
       },
       { new: true }
     ).select(
-      `_id name email lastLogin bio profileImage coverImage subscription role`
+      `_id name email lastLogin bio profileImage coverImage subscription role showCreAitionInstructions`
     );
     res.json(user);
   } catch (err) {
@@ -45,7 +48,7 @@ export const googleUser = async (req, res) => {
   const { name, email } = req.body;
   try {
     let user = await User.findOne({ email }).select(
-      `_id name email lastLogin bio profileImage coverImage subscription role`
+      `_id name email lastLogin bio profileImage coverImage subscription role showCreAitionInstructions`
     );
     if (!user) {
       user = await new User({
@@ -56,6 +59,9 @@ export const googleUser = async (req, res) => {
           startDate: new Date(),
           cost: '0.00',
           imagesRemaining: 5,
+          customerSupport: 'Standard',
+          dalleVersion: 'Dall-E-2',
+          gptVersion: 'GPT-3.5',
         },
       }).save();
     } else {
@@ -66,7 +72,7 @@ export const googleUser = async (req, res) => {
         },
         { new: true }
       ).select(
-        `_id name email lastLogin bio profileImage coverImage subscription role`
+        `_id name email lastLogin bio profileImage coverImage subscription role showCreAitionInstructions`
       );
     }
     res.json(user);
