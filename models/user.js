@@ -40,6 +40,7 @@ const userSchema = new mongoose.Schema(
     likes: { type: Number, default: 0 },
     downloads: { type: Number, default: 0 },
     newMessages: { type: Number, default: 0 },
+    showCreAitionInstructions: { type: Boolean, default: true },
   },
   { timestamps: true }
 );

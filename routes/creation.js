@@ -15,6 +15,7 @@ import {
   downloadCreation,
   likeCreation,
   unlikeCreation,
+  fetchCoverImage,
 } from '../controllers/creation.js';
 import { authCheck } from '../middleware/auth.js';
 
@@ -43,5 +44,6 @@ router.post('/fetch-user-liked-creations', authCheck, fetchUserLikedCreations);
 router.put('/download-creation', downloadCreation);
 router.put('/like-creation', authCheck, likeCreation);
 router.put('/unlike-creation', authCheck, unlikeCreation);
+router.get('/fetch-cover-image', fetchCoverImage);
 
 export default router;

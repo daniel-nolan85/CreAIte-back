@@ -191,3 +191,23 @@ export const captureUserEmail = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+export const acknowledgeCreAItionInstructions = async (req, res) => {
+  const { _id } = req.body;
+  try {
+    const user = await User.findByIdAndUpdate(
+      _id,
+      { $set: { showCreAitionInstructions: false } },
+      { new: true }
+    ).select('showCreAitionInstructions');
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (err) {
+    console.error('Error acknowledging instructions:', err);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};

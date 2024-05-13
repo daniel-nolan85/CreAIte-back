@@ -100,7 +100,6 @@ export const currentAdmin = async (req, res) => {
 
 export const confirmUserEmail = async (req, res) => {
   const { _id, email } = req.body;
-  console.log({ email });
   try {
     const user = await User.findOne({ _id, email });
     if (user) {
@@ -116,7 +115,6 @@ export const confirmUserEmail = async (req, res) => {
 
 export const checkUserExists = async (req, res) => {
   const { email } = req.body;
-  console.log({ email });
   try {
     const user = await User.findOne({ email });
     if (user) {

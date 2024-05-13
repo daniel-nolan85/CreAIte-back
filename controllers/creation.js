@@ -37,9 +37,11 @@ export const createPrompt = async (req, res) => {
 };
 
 export const createImage = async (req, res) => {
-  const { _id, prompt, imageSize, dalleVersion, imagesRemaining } = req.body;
+  const { _id, prompt, imageSize, dalleVersion } = req.body;
+  const imageQuantity = parseInt(req.body.imageQuantity);
   try {
-    if (imagesRemaining > 0) {
+    const generatedImages = [];
+    for (let i = 0; i < imageQuantity; i++) {
       const aiResponse = await openai.images.generate({
         model: dalleVersion === 'Dall-E-2' ? 'dall-e-2' : 'dall-e-3',
         prompt,
@@ -47,17 +49,21 @@ export const createImage = async (req, res) => {
         size: imageSize,
         response_format: 'b64_json',
       });
-      const image = aiResponse.data[0].b64_json;
-      const user = await User.findById(_id);
-      user.subscription.imagesRemaining -= 1;
-      await user.save();
-      res.json({ photo: image, user });
-    } else {
-      res.json({ message: 'No remaining images for generation' });
+      generatedImages.push(aiResponse.data[0].b64_json);
     }
+    const user = await User.findById(_id);
+    user.subscription.imagesRemaining -= imageQuantity;
+    await user.save();
+    res.json({ photos: generatedImages, user });
   } catch (error) {
     console.error(error);
-    res.status(500).send(error?.response.data.error.message);
+    if (error?.response?.data?.error?.code === 'content_policy_violation') {
+      res.status(400).send('Image description contains prohibited content.');
+    } else {
+      res
+        .status(500)
+        .send(error?.response?.data?.error?.message || 'Internal Server Error');
+    }
   }
 };
 
@@ -106,14 +112,19 @@ export const createKeywords = async (req, res) => {
 };
 
 export const saveCreation = async (req, res) => {
-  const { createdBy, prompt, photo, caption, keywords } = req.body.form;
+  const { createdBy, prompt, photos, caption, keywords } = req.body.form;
   const { sharing, imageSize, dalleVersion } = req.body;
   try {
-    const photoUrl = await cloudinary.uploader.upload(photo);
+    const photoUrls = await Promise.all(
+      photos.map(async (photo) => {
+        const photoUrl = await cloudinary.uploader.upload(photo);
+        return photoUrl.url;
+      })
+    );
     const newCreation = await Creation.create({
       createdBy,
       prompt,
-      photo: photoUrl.url,
+      photos: photoUrls,
       caption,
       keywords,
       sharing,
@@ -303,6 +314,22 @@ export const unlikeCreation = async (req, res) => {
       { new: true }
     );
     res.status(200).json(creation);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error });
+  }
+};
+
+export const fetchCoverImage = async (req, res) => {
+  try {
+    const coverImage = await Creation.aggregate([
+      { $sample: { size: 1 } },
+      { $project: { _id: 0, photos: 1 } },
+      { $unwind: '$photos' },
+      { $sample: { size: 1 } },
+      { $project: { randomImage: '$photos' } },
+    ]);
+    res.status(200).json(coverImage);
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, message: error });
