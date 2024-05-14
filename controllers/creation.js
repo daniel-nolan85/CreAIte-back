@@ -189,8 +189,10 @@ export const fetchUserCreations = async (req, res) => {
 export const fetchRandomCreations = async (req, res) => {
   try {
     const randomCreations = await Creation.aggregate([
+      { $unwind: '$photos' },
       { $sample: { size: 16 } },
-      { $project: { _id: 0, id: '$_id', src: '$photo' } },
+      { $group: { _id: null, photos: { $push: '$photos' } } },
+      { $project: { _id: 0, photos: 1 } },
     ]);
 
     res.status(200).json(randomCreations);
