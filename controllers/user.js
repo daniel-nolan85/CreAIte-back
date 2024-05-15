@@ -116,13 +116,14 @@ export const updateSubscription = async (req, res) => {
       { new: true }
     );
 
-    let transporter = nodemailer.createTransport({
-      service: 'gmail',
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.dreamhost.com',
+      port: 465,
+      secure: true,
       auth: {
         user: 'support@creaite.media',
         pass: process.env.DREAMHOST_AUTHORIZATION,
       },
-      secure: true,
     });
 
     let mailOptions = {
