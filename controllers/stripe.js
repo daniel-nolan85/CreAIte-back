@@ -43,9 +43,18 @@ export const createStripeSubscription = async (req, res) => {
       },
       expand: ['latest_invoice.payment_intent'],
     });
+    const paymentIntent = subscription.latest_invoice.payment_intent;
+
+    if (!paymentIntent) {
+      console.error('Payment intent is null:', subscription.latest_invoice);
+      return res
+        .status(500)
+        .json({ message: 'Failed to create payment intent' });
+    }
+
     res.json({
       message: 'Subscription successful!',
-      clientSecret: subscription.latest_invoice.payment_intent.client_secret,
+      clientSecret: paymentIntent.client_secret,
       subscriptionId: subscription.id,
     });
   } catch (err) {

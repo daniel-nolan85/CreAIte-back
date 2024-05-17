@@ -1,6 +1,9 @@
+import Stripe from 'stripe';
 import User from '../models/user.js';
 import Creation from '../models/creation.js';
 import admin from '../firebase/index.js';
+
+const stripe = new Stripe(process.env.LIVE_STRIPE_SECRET_KEY);
 
 export const createUser = async (req, res) => {
   const { name, email } = req.body;
@@ -135,8 +138,9 @@ export const checkUserExists = async (req, res) => {
 };
 
 export const deleteAccount = async (req, res) => {
-  const { _id } = req.body;
+  const { _id, subscriptionId } = req.body;
   try {
+    const subscription = await stripe.subscriptions.cancel(subscriptionId);
     const user = await User.findByIdAndDelete(_id).select('email');
     const creaitions = await Creation.updateMany(
       { createdBy: _id },
